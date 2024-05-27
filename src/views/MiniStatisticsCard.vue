@@ -87,30 +87,37 @@ const props = defineProps<{
   backgroundColor: string;
 }>();
 
+// Constants
+const HEX_BASE = 16;
+const MAX_COLOR_VALUE = 255;
+const MIN_COLOR_VALUE = 0;
+const COLOR_LENGTH = 6;
+const RED_SHIFT = 16;
+const GREEN_SHIFT = 8;
+const BLUE_MASK = 0x0000FF;
+const POUND_SIGN = '#';
+
 // Function to darken the color
 function darkenColor(color: string, amount: number): string {
   let usePound: boolean = false;
 
-  if (color[0] === "#") {
+  if (color[0] === POUND_SIGN) {
     color = color.slice(1);
     usePound = true;
   }
 
-  const num: number = parseInt(color, 16);
+  const num = parseInt(color, HEX_BASE);
 
-  let r: number = (num >> 16) - amount;
-  if (r < 0) r = 0;
-  else if (r > 255) r = 255;
+  let r = (num >> RED_SHIFT) - amount;
+  r = Math.max(MIN_COLOR_VALUE, Math.min(MAX_COLOR_VALUE, r));
 
-  let g: number = ((num >> 8) & 0x00ff) - amount;
-  if (g < 0) g = 0;
-  else if (g > 255) g = 255;
+  let g = ((num >> GREEN_SHIFT) & BLUE_MASK) - amount;
+  g = Math.max(MIN_COLOR_VALUE, Math.min(MAX_COLOR_VALUE, g));
 
-  let b: number = (num & 0x0000ff) - amount;
-  if (b < 0) b = 0;
-  else if (b > 255) b = 255;
+  let b = (num & BLUE_MASK) - amount;
+  b = Math.max(MIN_COLOR_VALUE, Math.min(MAX_COLOR_VALUE, b));
 
-  return (usePound ? "#" : "") + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  return (usePound ? POUND_SIGN : "") + ((r << RED_SHIFT) | (g << GREEN_SHIFT) | b).toString(HEX_BASE).padStart(COLOR_LENGTH, '0');
 }
 
 const darkenedBackgroundColor = computed(() => darkenColor(props.backgroundColor, 20));
