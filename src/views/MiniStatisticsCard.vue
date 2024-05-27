@@ -76,53 +76,41 @@
 }
 </style>
 
-<script setup>
-import { ref, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 
 // Define the props
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    default: '',
-  },
-  icon: {
-    type: String,
-    required: true,
-  },
-  backgroundColor: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  title: string;
+  description?: string;
+  icon: string;
+  backgroundColor: string;
+}>();
 
 // Function to darken the color
-function darkenColor(color, amount) {
-  let usePound = false;
+function darkenColor(color: string, amount: number): string {
+  let usePound: boolean = false;
 
   if (color[0] === "#") {
     color = color.slice(1);
     usePound = true;
   }
 
-  const num = parseInt(color, 16);
+  const num: number = parseInt(color, 16);
 
-  let r = (num >> 16) - amount;
+  let r: number = (num >> 16) - amount;
   if (r < 0) r = 0;
   else if (r > 255) r = 255;
 
-  let g = ((num >> 8) & 0x00ff) - amount;
+  let g: number = ((num >> 8) & 0x00ff) - amount;
   if (g < 0) g = 0;
   else if (g > 255) g = 255;
 
-  let b = (num & 0x0000ff) - amount;
+  let b: number = (num & 0x0000ff) - amount;
   if (b < 0) b = 0;
   else if (b > 255) b = 255;
 
-  return (usePound ? "#" : "") + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+  return (usePound ? "#" : "") + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
 }
 
 const darkenedBackgroundColor = computed(() => darkenColor(props.backgroundColor, 20));
