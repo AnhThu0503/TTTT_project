@@ -5,6 +5,7 @@ import { reactive, watch } from 'vue'
 import { SmileOutlined } from '@ant-design/icons-vue'
 import { Dayjs } from 'dayjs'
 import { useRouter } from 'vue-router'
+import MiniStatisticsCard from "./MiniStatisticsCard.vue";
 
 const loai = ref<SelectProps['value']>('chi') // Set default value to "chi"
 const router = useRouter() // Initialize the router
@@ -50,17 +51,14 @@ const onFinish = (values: any) => {
 }
 
 const categories = [
-  { name: 'Ăn uống', icon: 'bi-egg-fried', image: '../../public/1.png' },
-  { name: 'Đi lại', icon: 'bi-fuel-pump-fill', image: '../../public/2.png' },
-  { name: 'Tiền nhà', icon: 'bi-house-heart', image: '../../public/3.png' },
-  { name: 'Liên lạc', icon: 'bi bi-whatsapp', image: '../../public/4.png' },
-  { name: 'Tiền điện', icon: 'bi-plugin', image: '../../public/5.png' },
-  { name: 'Quẩn áo', icon: 'bi-backpack2', image: '../../public/6.png' },
-  { name: 'Y tế', icon: 'bi-bandaid', image: '../../public/7.png' },
-  { name: 'Giáo dục', icon: 'bi-journal-check', image: '../../public/8.png' },
-  { name: 'Chi tiêu', icon: 'bi-cart', image: '../../public/12.png' },
-  { name: 'Giao lưu', icon: 'bi-gift', image: '../../public/10.png' },
-  { name: 'Mỹ phẩm', icon: 'bi-flower2', image: '../../public/11.png' }
+  { name: 'Tiền nhà', description: 'chi tiết...', icon: 'bi-house-heart', backgroundColor: '#52c290' },
+  { name: 'Liên lạc', description: 'chi tiết...', icon: 'bi bi-whatsapp', backgroundColor: '#3f81bb' },
+  { name: 'Tiền điện', description: 'chi tiết...', icon: 'bi-plugin', backgroundColor: '#f97171' },
+  { name: 'Quẩn áo', description: 'chi tiết...', icon: 'bi-backpack2', backgroundColor: '#f4a11f' },
+  { name: 'Y tế', description: 'chi tiết...', icon: 'bi-clipboard2-pulse', backgroundColor: '#53b4f8' },
+  { name: 'Giáo dục', description: 'chi tiết...', icon: 'bi-backpack', backgroundColor: '#CCFF66' },
+  { name: 'Chi tiêu', description: 'chi tiết...', icon: 'bi-cart', backgroundColor: '#DDDDDD' },
+  { name: 'Mỹ phẩm', description: 'chi tiết...', icon: 'bi-flower2', backgroundColor: '#FF6633' },
 ]
 </script>
 
@@ -76,48 +74,24 @@ const categories = [
             </a-radio-group>
           </div>
           <div class="card-body">
-            <a-form
-              :model="formState"
-              v-bind="layout"
-              name="nest-messages"
-              :validate-messages="validateMessages"
-              @finish="onFinish"
-            >
-              <a-form-item
-                :name="['transaction', 'soTien']"
-                label="Số tiền"
-                :rules="[{ type: 'number', min: 0, required: true }]"
-              >
+            <a-form :model="formState" v-bind="layout" name="nest-messages" :validate-messages="validateMessages"
+              @finish="onFinish">
+              <a-form-item :name="['transaction', 'soTien']" label="Số tiền"
+                :rules="[{ type: 'number', min: 0, required: true }]">
                 <a-input-number v-model:value="formState.transaction.soTien" size="large" />
               </a-form-item>
-              <a-form-item
-                :name="['transaction', 'ngayTao']"
-                label="Ngày tạo"
-                :rules="[{ required: true }]"
-              >
-                <a-date-picker
-                  @change="onChange"
-                  v-model:value="formState.transaction.ngayTao"
-                  placeholder="Select date"
-                  size="large"
-                >
+              <a-form-item :name="['transaction', 'ngayTao']" label="Ngày tạo" :rules="[{ required: true }]">
+                <a-date-picker @change="onChange" v-model:value="formState.transaction.ngayTao"
+                  placeholder="Select date" size="large">
                   <template #suffixIcon>
                     <SmileOutlined />
                   </template>
                 </a-date-picker>
               </a-form-item>
-              <!-- <a-form-item
-                :name="['transaction', 'danhMuc']"
-                label="Danh mục"
-                :rules="[{ required: true }]"
-              >
+              <a-form-item :name="['transaction', 'danhMuc']" label="Danh mục" :rules="[{ required: true }]">
                 <a-input v-model:value="formState.transaction.danhMuc" />
-              </a-form-item> -->
-              <a-form-item
-                :name="['transaction', 'ghiChu']"
-                label="Ghi chú"
-                :rules="[{ type: 'text' }]"
-              >
+              </a-form-item>
+              <a-form-item :name="['transaction', 'ghiChu']" label="Ghi chú" :rules="[{ type: 'text' }]">
                 <a-input v-model:value="formState.transaction.ghiChu" size="large" />
               </a-form-item>
 
@@ -134,23 +108,11 @@ const categories = [
       <p>Chọn danh mục</p>
       <div class="d-flex flex-wrap">
         <template v-for="(category, index) in categories" :key="category.name">
-          <div
-            class="col-sm-3 d-flex py-4 px-4 mb-3 me-4"
-            :style="{
-              backgroundImage: 'url(' + category.image + ')',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              borderRadius: '10px',
-              justifyContent: 'space-between',
-              border: '2px solid #ccc',
-              fontWeight: '600'
-            }"
-          >
-            <p class="p-0 m-0 pt-2" style="font-size: 1.2rem; color: #fff">{{ category.name }}</p>
-            <p class="p-0 m-0 p-2" style="background-color: #ffffff61; border-radius: 50%">
-              <!-- Use dynamic class for icon -->
-              <i :class="category.icon + ' fs-5'" style="color: #fff"></i>
-            </p>
+          <div class="m-1">
+
+            <mini-statistics-card :title="`${category.name}`" :description="`${category.description}`"
+              :icon="`${category.icon}`" :backgroundColor="`${category.backgroundColor}`" />
+
           </div>
           <!-- Insert line break after every third category -->
           <br v-if="(index + 1) % 3 === 0 && index !== categories.length - 1" />
