@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import type { SelectProps } from 'ant-design-vue'
-import { reactive, watch } from 'vue'
 import { SmileOutlined } from '@ant-design/icons-vue'
 import { Dayjs } from 'dayjs'
 import { useRouter } from 'vue-router'
-
+import MiniStatisticsCard from './MiniStatisticsCard.vue'
 const loai = ref<SelectProps['value']>('chi') // Set default value to "chi"
 const router = useRouter() // Initialize the router
+
 watch(loai, (newValue) => {
   if (newValue === 'thu') {
     // router.push('/about')
   }
 })
+
 const onChange = (date: Dayjs | string, dateString: string) => {
   console.log(date, dateString)
 }
@@ -20,6 +21,7 @@ const onChange = (date: Dayjs | string, dateString: string) => {
 const onRangeChange = (date: [Dayjs, Dayjs], dateString: [string, string]) => {
   console.log(date, dateString)
 }
+
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 16 }
@@ -27,13 +29,6 @@ const layout = {
 
 const validateMessages = {
   required: '${label} is required!'
-  // types: {
-  //   email: '${label} is not a valid email!',
-  //   number: '${label} is not a valid number!'
-  // },
-  // number: {
-  //   range: '${label} must be between ${min} and ${max}'
-  // }
 }
 
 const formState = reactive({
@@ -45,25 +40,25 @@ const formState = reactive({
     loai: ''
   }
 })
+
 const onFinish = (values: any) => {
   console.log('Success:', values)
 }
 
 const categories = [
-  { name: 'Ăn uống', icon: 'bi-egg-fried', image: '../../public/1.png' },
-  { name: 'Đi lại', icon: 'bi-fuel-pump-fill', image: '../../public/2.png' },
-  { name: 'Tiền nhà', icon: 'bi-house-heart', image: '../../public/3.png' },
-  { name: 'Liên lạc', icon: 'bi bi-whatsapp', image: '../../public/4.png' },
-  { name: 'Tiền điện', icon: 'bi-plugin', image: '../../public/5.png' },
-  { name: 'Quẩn áo', icon: 'bi-backpack2', image: '../../public/6.png' },
-  { name: 'Y tế', icon: 'bi-bandaid', image: '../../public/7.png' },
-  { name: 'Giáo dục', icon: 'bi-journal-check', image: '../../public/8.png' },
-  { name: 'Chi tiêu', icon: 'bi-cart', image: '../../public/12.png' },
-  { name: 'Giao lưu', icon: 'bi-gift', image: '../../public/10.png' },
-  { name: 'Mỹ phẩm', icon: 'bi-flower2', image: '../../public/11.png' }
+  { name: 'Ăn uống', color: 'red', icon: 'bi-egg-fried', image: '../../public/1.png' },
+  { name: 'Đi lại', color: 'yellow', icon: 'bi-fuel-pump-fill', image: '../../public/2.png' },
+  { name: 'Tiền nhà', color: 'gray', icon: 'bi-house-heart', image: '../../public/3.png' },
+  { name: 'Liên lạc', color: 'gray', icon: 'bi-whatsapp', image: '../../public/4.png' },
+  { name: 'Tiền điện', color: 'gray', icon: 'bi-plugin', image: '../../public/5.png' },
+  { name: 'Quần áo', color: 'gray', icon: 'bi-backpack2', image: '../../public/6.png' },
+  { name: 'Y tế', color: 'gray', icon: 'bi-bandaid', image: '../../public/7.png' },
+  { name: 'Giáo dục', color: 'gray', icon: 'bi-journal-check', image: '../../public/8.png' },
+  { name: 'Chi tiêu', color: 'gray', icon: 'bi-cart', image: '../../public/12.png' },
+  { name: 'Giao lưu', color: 'gray', icon: 'bi-gift', image: '../../public/10.png' },
+  { name: 'Mỹ phẩm', color: 'gray', icon: 'bi-flower2', image: '../../public/11.png' }
 ]
 </script>
-
 <template>
   <div class="container-content d-flex" style="justify-content: space-between">
     <div class="box-left col-sm-5">
@@ -106,13 +101,6 @@ const categories = [
                   </template>
                 </a-date-picker>
               </a-form-item>
-              <!-- <a-form-item
-                :name="['transaction', 'danhMuc']"
-                label="Danh mục"
-                :rules="[{ required: true }]"
-              >
-                <a-input v-model:value="formState.transaction.danhMuc" />
-              </a-form-item> -->
               <a-form-item
                 :name="['transaction', 'ghiChu']"
                 label="Ghi chú"
@@ -134,23 +122,11 @@ const categories = [
       <p>Chọn danh mục</p>
       <div class="d-flex flex-wrap">
         <template v-for="(category, index) in categories" :key="category.name">
-          <div
-            class="col-sm-3 d-flex py-4 px-4 mb-3 me-4"
-            :style="{
-              backgroundImage: 'url(' + category.image + ')',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              borderRadius: '10px',
-              justifyContent: 'space-between',
-              border: '2px solid #ccc',
-              fontWeight: '600'
-            }"
-          >
-            <p class="p-0 m-0 pt-2" style="font-size: 1.2rem; color: #fff">{{ category.name }}</p>
-            <p class="p-0 m-0 p-2" style="background-color: #ffffff61; border-radius: 50%">
-              <!-- Use dynamic class for icon -->
-              <i :class="category.icon + ' fs-5'" style="color: #fff"></i>
-            </p>
+          <div class="m-1">
+            <MiniStatisticsCard
+              :title="{ text: category.name, color: category.color }"
+              :icon="category.icon"
+            />
           </div>
           <!-- Insert line break after every third category -->
           <br v-if="(index + 1) % 3 === 0 && index !== categories.length - 1" />

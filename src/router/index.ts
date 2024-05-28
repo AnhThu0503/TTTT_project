@@ -19,11 +19,19 @@ const router = createRouter({
     },
     {
       path: '/transaction/add/chi',
-      name: 'transactio-chi',
+      name: 'transaction-chi',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/TransactionCreateChi.vue')
+    },
+    {
+      path: '/transactions',
+      name: 'transactions',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/TransactionList.vue')
     },
     {
       path: '/signup',

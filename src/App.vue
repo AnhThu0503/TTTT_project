@@ -22,7 +22,7 @@ const openKeys = ref<string[]>(['sub1'])
     </div> -->
   <!-- </header> -->
 
-  <a-layout style="height: 100vh">
+  <a-layout style="min-height: 100vh">
     <a-layout-header
       class="header"
       style="
