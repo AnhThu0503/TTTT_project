@@ -1,3 +1,4 @@
+<!-- eslint-disable no-case-declarations -->
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import type { Dayjs } from 'dayjs'
@@ -7,52 +8,150 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import weekday from 'dayjs/plugin/weekday'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'
+import { Bar } from 'vue-chartjs'
 dayjs.extend(customParseFormat)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
 dayjs.extend(weekday)
 dayjs.extend(quarterOfYear)
 
-const data = ref<Dayjs | null>(null)
+const data = ref<[Dayjs, Dayjs]>()
 const picker = ref<'week' | 'month' | 'quarter' | 'year'>('week')
-const startDate = ref()
-const endDate = ref()
-const handleDateChange = (value: Dayjs) => {
+const startDate = ref<Dayjs | null>(null)
+const endDate = ref<Dayjs | null>(null)
+const weekRanges = ref<Array<[Dayjs, Dayjs]>>([])
+const monthRanges = ref<Array<[Dayjs, Dayjs]>>([])
+const quarterRanges = ref<Array<[Dayjs, Dayjs]>>([])
+const yearRanges = ref<Array<[Dayjs, Dayjs]>>([])
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+const dataChart = ref({
+  labels: [],
+  datasets: [
+    {
+      label: 'Expenses',
+      backgroundColor: '#f87979',
+      data: []
+    },
+    {
+      label: 'Income',
+      backgroundColor: '#7cb5ec',
+      data: []
+    }
+  ]
+})
+
+const options = {
+  responsive: true,
+  maintainAspectRatio: false
+}
+
+const handleDateChange = (value: [Dayjs, Dayjs]) => {
   data.value = value
   if (data.value) {
+    const [start, end] = data.value
     switch (picker.value) {
       case 'week':
-        startDate.value = dayjs(data.value).startOf('week')
-        endDate.value = dayjs(data.value).endOf('week')
-        console.log('Start of week:', startDate.value.format('YYYY-MM-DD'))
-        console.log('End of week:', endDate.value.format('YYYY-MM-DD'))
+        startDate.value = dayjs(start).startOf('week')
+        endDate.value = dayjs(end).endOf('week')
+
+        weekRanges.value = []
+        let currentWeek = dayjs(startDate.value)
+        while (currentWeek.isSameOrBefore(endDate.value, 'week')) {
+          const weekStart: any = dayjs(currentWeek.startOf('week')).format('YYYY-MM-DD')
+          const weekEnd: any = dayjs(currentWeek.endOf('week')).format('YYYY-MM-DD')
+          weekRanges.value.push([weekStart, weekEnd])
+          currentWeek = currentWeek.add(1, 'week')
+        }
+        console.log('weekRanges', weekRanges.value)
         break
+
       case 'month':
-        startDate.value = dayjs(data.value).startOf('month')
-        endDate.value = dayjs(data.value).endOf('month')
-        console.log('Start of month:', startDate.value.format('YYYY-MM-DD'))
-        console.log('End of month:', endDate.value.format('YYYY-MM-DD'))
+        startDate.value = dayjs(start).startOf('month')
+        endDate.value = dayjs(end).endOf('month')
+
+        monthRanges.value = []
+        let currentMonth = dayjs(startDate.value)
+        while (currentMonth.isSameOrBefore(endDate.value, 'month')) {
+          const monthStart: any = dayjs(currentMonth.startOf('month')).format('YYYY-MM-DD')
+          const monthEnd: any = dayjs(currentMonth.endOf('month')).format('YYYY-MM-DD')
+          monthRanges.value.push([monthStart, monthEnd])
+          currentMonth = currentMonth.add(1, 'month')
+        }
+        console.log('monthRanges', monthRanges.value)
+
         break
+
       case 'quarter':
-        startDate.value = dayjs(data.value).startOf('quarter')
-        endDate.value = dayjs(data.value).endOf('quarter')
-        console.log('Start of quarter:', startDate.value.format('YYYY-MM-DD'))
-        console.log('End of quarter:', endDate.value.format('YYYY-MM-DD'))
+        startDate.value = dayjs(start).startOf('quarter')
+        endDate.value = dayjs(end).endOf('quarter')
+
+        quarterRanges.value = []
+        let currentQuarter = dayjs(startDate.value)
+        while (currentQuarter.isSameOrBefore(endDate.value)) {
+          const quarterStart: any = dayjs(currentQuarter.startOf('quarter')).format('YYYY-MM-DD')
+          const quarterEnd: any = dayjs(currentQuarter.endOf('quarter')).format('YYYY-MM-DD')
+          quarterRanges.value.push([quarterStart, quarterEnd])
+          currentQuarter = currentQuarter.add(1, 'quarter')
+        }
+        console.log('quarterRanges', quarterRanges.value)
+
         break
+
       case 'year':
-        startDate.value = dayjs(data.value).startOf('year')
-        endDate.value = dayjs(data.value).endOf('year')
-        console.log('Start of year:', startDate.value.format('YYYY-MM-DD'))
-        console.log('End of year:', endDate.value.format('YYYY-MM-DD'))
+        startDate.value = dayjs(start).startOf('year')
+        endDate.value = dayjs(end).endOf('year')
+
+        yearRanges.value = []
+        let currentYear: any = dayjs(startDate.value)
+        while (currentYear.isSameOrBefore(endDate.value, 'year')) {
+          const yearStart: any = dayjs(currentYear.startOf('year')).format('YYYY-MM-DD')
+          const yearEnd: any = dayjs(currentYear.endOf('year')).format('YYYY-MM-DD')
+          yearRanges.value.push([yearStart, yearEnd])
+          currentYear = currentYear.add(1, 'year')
+        }
+        console.log('yearRanges', yearRanges.value)
+
         break
-      default:
-        console.log('data', dayjs(data.value).format('YYYY-MM-DD'))
     }
   }
 }
 
-// Watch picker changes to handle specific cases
-watch(picker, (newPicker) => {
+// Insert data into dataChart
+const insertDataIntoChart = (dataResponse: any) => {
+  dataChart.value.labels = dataResponse.map((item: any) => item.period)
+  dataChart.value.datasets[0].data = dataResponse.map((item: any) => item.dataQueryExpenses)
+  dataChart.value.datasets[1].data = dataResponse.map((item: any) => item.dataQueryIncome)
+}
+
+// Provided data
+const dataResponse = [
+  {
+    period: '2024-06-09 to 2024-06-15',
+    dataQueryExpenses: 0,
+    dataQueryIncome: 0
+  },
+  {
+    period: '2024-06-16 to 2024-06-22',
+    dataQueryExpenses: '50000',
+    dataQueryIncome: '500000'
+  }
+]
+
+// Insert the provided data into the chart
+insertDataIntoChart(dataResponse)
+
+watch(picker, () => {
   if (data.value) {
     handleDateChange(data.value)
   }
@@ -60,22 +159,22 @@ watch(picker, (newPicker) => {
 </script>
 
 <template>
-  <!-- SELECT SUM(t.transactionAmount) AS totalAmount
-FROM transaction t
-JOIN category c ON t.categoryID = c.categoryID
-WHERE t.userID = 23
-  AND t.isDeleted = 0
-  AND c.categoryType = 0
-  AND t.transactionDate BETWEEN '2024-06-11' AND '2024-06-18'; -->
-  <a-radio-group v-model:value="picker">
-    <a-radio-button value="week">Week</a-radio-button>
-    <a-radio-button value="month">Month</a-radio-button>
-    <a-radio-button value="quarter">Quarter</a-radio-button>
-    <a-radio-button value="year">Year</a-radio-button>
-  </a-radio-group>
-  <br />
-  <br />
-  <a-space direction="vertical" :size="12">
-    <a-date-picker v-model:value="data" :picker="picker" @change="handleDateChange" />
-  </a-space>
+  <div class="row" style="min-height: 100vh">
+    <div class="col-sm-4">
+      <a-radio-group v-model:value="picker">
+        <a-radio-button value="week">Week</a-radio-button>
+        <a-radio-button value="month">Month</a-radio-button>
+        <a-radio-button value="quarter">Quarter</a-radio-button>
+        <a-radio-button value="year">Year</a-radio-button>
+      </a-radio-group>
+      <br />
+      <br />
+      <a-space direction="vertical" :size="12">
+        <a-range-picker v-model:value="data" :picker="picker" @change="handleDateChange" />
+      </a-space>
+    </div>
+    <div class="col-sm-8">
+      <Bar :data="dataChart" :options="options" />
+    </div>
+  </div>
 </template>
