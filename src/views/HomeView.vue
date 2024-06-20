@@ -18,6 +18,7 @@ import {
   LinearScale
 } from 'chart.js'
 import { Bar } from 'vue-chartjs'
+
 dayjs.extend(customParseFormat)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
@@ -28,10 +29,7 @@ const data = ref<[Dayjs, Dayjs]>()
 const picker = ref<'week' | 'month' | 'quarter' | 'year'>('week')
 const startDate = ref<Dayjs | null>(null)
 const endDate = ref<Dayjs | null>(null)
-const weekRanges = ref<Array<[Dayjs, Dayjs]>>([])
-const monthRanges = ref<Array<[Dayjs, Dayjs]>>([])
-const quarterRanges = ref<Array<[Dayjs, Dayjs]>>([])
-const yearRanges = ref<Array<[Dayjs, Dayjs]>>([])
+const valuesRanges = ref<Array<[Dayjs, Dayjs]>>([])
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -39,13 +37,8 @@ const dataChart = ref({
   labels: [],
   datasets: [
     {
-      label: 'Expenses',
-      backgroundColor: '#f87979',
-      data: []
-    },
-    {
-      label: 'Income',
-      backgroundColor: '#7cb5ec',
+      label: 'Total Amount',
+      backgroundColor: [],
       data: []
     }
   ]
@@ -64,64 +57,56 @@ const handleDateChange = (value: [Dayjs, Dayjs]) => {
       case 'week':
         startDate.value = dayjs(start).startOf('week')
         endDate.value = dayjs(end).endOf('week')
-
-        weekRanges.value = []
+        valuesRanges.value = []
         let currentWeek = dayjs(startDate.value)
         while (currentWeek.isSameOrBefore(endDate.value, 'week')) {
           const weekStart: any = dayjs(currentWeek.startOf('week')).format('YYYY-MM-DD')
           const weekEnd: any = dayjs(currentWeek.endOf('week')).format('YYYY-MM-DD')
-          weekRanges.value.push([weekStart, weekEnd])
+          valuesRanges.value.push([weekStart, weekEnd])
           currentWeek = currentWeek.add(1, 'week')
         }
-        console.log('weekRanges', weekRanges.value)
         break
 
       case 'month':
         startDate.value = dayjs(start).startOf('month')
         endDate.value = dayjs(end).endOf('month')
 
-        monthRanges.value = []
+        valuesRanges.value = []
         let currentMonth = dayjs(startDate.value)
         while (currentMonth.isSameOrBefore(endDate.value, 'month')) {
           const monthStart: any = dayjs(currentMonth.startOf('month')).format('YYYY-MM-DD')
           const monthEnd: any = dayjs(currentMonth.endOf('month')).format('YYYY-MM-DD')
-          monthRanges.value.push([monthStart, monthEnd])
+          valuesRanges.value.push([monthStart, monthEnd])
           currentMonth = currentMonth.add(1, 'month')
         }
-        console.log('monthRanges', monthRanges.value)
-
         break
 
       case 'quarter':
         startDate.value = dayjs(start).startOf('quarter')
         endDate.value = dayjs(end).endOf('quarter')
 
-        quarterRanges.value = []
+        valuesRanges.value = []
         let currentQuarter = dayjs(startDate.value)
         while (currentQuarter.isSameOrBefore(endDate.value)) {
           const quarterStart: any = dayjs(currentQuarter.startOf('quarter')).format('YYYY-MM-DD')
           const quarterEnd: any = dayjs(currentQuarter.endOf('quarter')).format('YYYY-MM-DD')
-          quarterRanges.value.push([quarterStart, quarterEnd])
+          valuesRanges.value.push([quarterStart, quarterEnd])
           currentQuarter = currentQuarter.add(1, 'quarter')
         }
-        console.log('quarterRanges', quarterRanges.value)
-
         break
 
       case 'year':
         startDate.value = dayjs(start).startOf('year')
         endDate.value = dayjs(end).endOf('year')
 
-        yearRanges.value = []
+        valuesRanges.value = []
         let currentYear: any = dayjs(startDate.value)
         while (currentYear.isSameOrBefore(endDate.value, 'year')) {
           const yearStart: any = dayjs(currentYear.startOf('year')).format('YYYY-MM-DD')
           const yearEnd: any = dayjs(currentYear.endOf('year')).format('YYYY-MM-DD')
-          yearRanges.value.push([yearStart, yearEnd])
+          valuesRanges.value.push([yearStart, yearEnd])
           currentYear = currentYear.add(1, 'year')
         }
-        console.log('yearRanges', yearRanges.value)
-
         break
     }
   }
@@ -129,22 +114,26 @@ const handleDateChange = (value: [Dayjs, Dayjs]) => {
 
 // Insert data into dataChart
 const insertDataIntoChart = (dataResponse: any) => {
-  dataChart.value.labels = dataResponse.map((item: any) => item.period)
-  dataChart.value.datasets[0].data = dataResponse.map((item: any) => item.dataQueryExpenses)
-  dataChart.value.datasets[1].data = dataResponse.map((item: any) => item.dataQueryIncome)
+  dataChart.value.labels = dataResponse.map((item: any) => item.categoryName)
+  dataChart.value.datasets[0].data = dataResponse.map((item: any) => item.totalAmount)
+  dataChart.value.datasets[0].backgroundColor = dataResponse.map((item: any) =>
+    item.categoryType === 0 ? '#FFCC99' : '#99CC99'
+  )
 }
 
 // Provided data
 const dataResponse = [
   {
-    period: '2024-06-09 to 2024-06-15',
-    dataQueryExpenses: 0,
-    dataQueryIncome: 0
+    categoryType: 0,
+    categoryName: 'Ăn uống',
+    totalAmount: 50000,
+    transactionCount: 2
   },
   {
-    period: '2024-06-16 to 2024-06-22',
-    dataQueryExpenses: '50000',
-    dataQueryIncome: '500000'
+    categoryType: 1,
+    categoryName: 'Lương',
+    totalAmount: 500000,
+    transactionCount: 1
   }
 ]
 
