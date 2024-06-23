@@ -39,18 +39,18 @@ const router = createRouter({
   ]
 })
 // Simulate an authentication check function
-function isAuthenticated() {
-  // Replace this with actual authentication logic
-  return !!localStorage.getItem('userToken')
-}
+// function isAuthenticated() {
+//   // Replace this with actual authentication logic
+//   return !!localStorage.getItem('userToken')
+// }
 
-// Add the beforeEach guard
-router.beforeEach((to, from, next) => {
-  if (to.name !== 'signup' && !isAuthenticated()) {
-    // Redirect to signup page if not authenticated
-    next({ name: 'signup' })
-  } else {
-    next() // Allow navigation if authenticated or navigating to signup
-  }
-})
+// // Add the beforeEach guard
+// router.beforeEach((to, from, next) => {
+//   if (to.name !== 'signup' && !isAuthenticated()) {
+//     // Redirect to signup page if not authenticated
+//     next({ name: 'signup' })
+//   } else {
+//     next() // Allow navigation if authenticated or navigating to signup
+//   }
+// })
 export default router

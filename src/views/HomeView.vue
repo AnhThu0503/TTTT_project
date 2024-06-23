@@ -145,33 +145,79 @@ watch(picker, () => {
     handleDateChange(data.value)
   }
 })
+
+//detail
+const columns = [
+  {
+    title: 'Thời gian',
+    dataIndex: 'time',
+    key: 'time'
+  },
+  {
+    title: 'Thu',
+    dataIndex: 'income',
+    key: 'income'
+  },
+  {
+    title: 'Chi',
+    dataIndex: 'expenses',
+    key: 'expenses'
+  }
+]
+
+const dataDetail = [
+  {
+    key: '1',
+    time: 'John Brown',
+    income: '￥300,000.00',
+    expenses: 'New York No. 1 Lake Park'
+  },
+  {
+    key: '2',
+    time: 'Jim Green',
+    income: '￥1,256,000.00',
+    expenses: 'London No. 1 Lake Park'
+  }
+]
 </script>
 
 <template>
-  <div
-    class="col-sm-10 mx-auto d-flex"
-    style="justify-content: space-between; box-sizing: border-box"
-  >
-    <a-radio-group v-model:value="picker">
+  <div class="col-sm-12 d-flex" style="box-sizing: border-box">
+    <a-radio-group v-model:value="picker" class="me-4 pe-4">
       <a-radio-button value="week">Tuần</a-radio-button>
       <a-radio-button value="month">Tháng</a-radio-button>
       <a-radio-button value="quarter">Quý</a-radio-button>
       <a-radio-button value="year">Năm</a-radio-button>
     </a-radio-group>
-    <a-space direction="vertical" :size="12">
+    <a-space direction="vertical" :size="12" class="me-4 pe-4">
       <a-range-picker v-model:value="data" :picker="picker" @change="handleDateChange" />
     </a-space>
-    <a-radio-group v-model:value="placement">
+    <a-radio-group v-model:value="placement" class="me-4 pe-4">
       <a-radio-button value="topLeft">Pie</a-radio-button>
       <a-radio-button value="topRight">Line</a-radio-button>
       <a-radio-button value="bottomLeft">Bar</a-radio-button>
     </a-radio-group>
   </div>
-  <div class="col-sm-10 mt-4 mx-auto p-4" style="background-color: #fff; border-radius: 10px">
+  <div class="col-sm-12 mt-4 p-4" style="background-color: #fff; border-radius: 10px">
     <Bar
       :data="dataChart"
       :options="options"
       style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 18px"
     />
   </div>
+  <div class="col-sm-12 mt-4">
+    <a-table :columns="columns" :data-source="dataDetail" bordered>
+      <template #bodyCell="{ column, text }">
+        <template v-if="column.dataIndex === 'time'">
+          <a>{{ text }}</a>
+        </template>
+      </template>
+      <template #title>Chi tiết thống kê</template>
+    </a-table>
+  </div>
 </template>
+<style scoped>
+#title {
+  text-align: left !important;
+}
+</style>
