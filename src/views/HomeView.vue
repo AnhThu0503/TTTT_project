@@ -32,7 +32,7 @@ const endDate = ref<Dayjs | null>(null)
 const valuesRanges = ref<Array<[Dayjs, Dayjs]>>([])
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
-
+const placement = ref('topLeft' as const)
 const dataChart = ref({
   labels: [],
   datasets: [
@@ -148,22 +148,30 @@ watch(picker, () => {
 </script>
 
 <template>
-  <div class="row" style="min-height: 100vh">
-    <div class="col-sm-4">
-      <a-radio-group v-model:value="picker">
-        <a-radio-button value="week">Week</a-radio-button>
-        <a-radio-button value="month">Month</a-radio-button>
-        <a-radio-button value="quarter">Quarter</a-radio-button>
-        <a-radio-button value="year">Year</a-radio-button>
-      </a-radio-group>
-      <br />
-      <br />
-      <a-space direction="vertical" :size="12">
-        <a-range-picker v-model:value="data" :picker="picker" @change="handleDateChange" />
-      </a-space>
-    </div>
-    <div class="col-sm-8">
-      <Bar :data="dataChart" :options="options" />
-    </div>
+  <div
+    class="col-sm-10 mx-auto d-flex"
+    style="justify-content: space-between; box-sizing: border-box"
+  >
+    <a-radio-group v-model:value="picker">
+      <a-radio-button value="week">Tuần</a-radio-button>
+      <a-radio-button value="month">Tháng</a-radio-button>
+      <a-radio-button value="quarter">Quý</a-radio-button>
+      <a-radio-button value="year">Năm</a-radio-button>
+    </a-radio-group>
+    <a-space direction="vertical" :size="12">
+      <a-range-picker v-model:value="data" :picker="picker" @change="handleDateChange" />
+    </a-space>
+    <a-radio-group v-model:value="placement">
+      <a-radio-button value="topLeft">Pie</a-radio-button>
+      <a-radio-button value="topRight">Line</a-radio-button>
+      <a-radio-button value="bottomLeft">Bar</a-radio-button>
+    </a-radio-group>
+  </div>
+  <div class="col-sm-10 mt-4 mx-auto p-4" style="background-color: #fff; border-radius: 10px">
+    <Bar
+      :data="dataChart"
+      :options="options"
+      style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 18px"
+    />
   </div>
 </template>

@@ -1,134 +1,48 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+<script lang="ts" setup>
+import siderbar from './components/siderbar.vue'
 import { ref } from 'vue'
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue'
-const selectedKeys1 = ref<string[]>(['2'])
-const selectedKeys2 = ref<string[]>(['1'])
-const openKeys = ref<string[]>(['sub1'])
+const value = ref<string>('')
+
+const onSearch = (searchValue: string) => {
+  console.log('use value', searchValue)
+  console.log('or use this.value', value.value)
+}
 </script>
-
 <template>
-  <!-- <header> -->
-  <!-- <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/signup">Signup</RouterLink>
-      </nav>
-    </div> -->
-  <!-- </header> -->
-
-  <a-layout style="min-height: 100vh">
-    <a-layout-header
-      class="header"
-      style="
-        height: 10vh;
-        background-image: url('../public/728ad5de6bc2134c31712174a74a32c7.jpg');
-        background-position: top;
-      "
-    >
-      <div class="logo" />
-      <a-menu
-        v-model:selectedKeys="selectedKeys1"
-        mode="horizontal"
-        :style="{
-          lineHeight: '64px',
-          height: '10vh',
-          backgroundImage: 'url(../public/728ad5de6bc2134c31712174a74a32c7.jpg)',
-          backgroundPosition: 'top'
-        }"
-      >
-        <a-menu-item key="1">nav 1</a-menu-item>
-        <a-menu-item key="2">nav 2</a-menu-item>
-        <a-menu-item key="3">nav 3</a-menu-item>
-      </a-menu>
-    </a-layout-header>
-    <a-layout>
-      <a-layout-sider width="200" style="background: #fff">
-        <a-menu
-          v-model:selectedKeys="selectedKeys2"
-          v-model:openKeys="openKeys"
-          mode="inline"
-          :style="{ height: '100%', borderRight: 0 }"
-        >
-          <a-sub-menu key="sub1">
-            <template #title>
-              <span>
-                <user-outlined />
-                subnav 1
-              </span>
-            </template>
-            <a-menu-item key="1">option1</a-menu-item>
-            <a-menu-item key="2">option2</a-menu-item>
-            <a-menu-item key="3">option3</a-menu-item>
-            <a-menu-item key="4">option4</a-menu-item>
-          </a-sub-menu>
-          <a-sub-menu key="sub2">
-            <template #title>
-              <span>
-                <laptop-outlined />
-                subnav 2
-              </span>
-            </template>
-            <a-menu-item key="5">option5</a-menu-item>
-            <a-menu-item key="6">option6</a-menu-item>
-            <a-menu-item key="7">option7</a-menu-item>
-            <a-menu-item key="8">option8</a-menu-item>
-          </a-sub-menu>
-          <a-sub-menu key="sub3">
-            <template #title>
-              <span>
-                <notification-outlined />
-                subnav 3
-              </span>
-            </template>
-            <a-menu-item key="9">option9</a-menu-item>
-            <a-menu-item key="10">option10</a-menu-item>
-            <a-menu-item key="11">option11</a-menu-item>
-            <a-menu-item key="12">option12</a-menu-item>
-          </a-sub-menu>
-        </a-menu>
-      </a-layout-sider>
-      <a-layout style="padding: 0 24px 24px">
-        <a-breadcrumb style="margin: 16px 0">
-          <a-breadcrumb-item>Home</a-breadcrumb-item>
-          <a-breadcrumb-item>List</a-breadcrumb-item>
-          <a-breadcrumb-item>App</a-breadcrumb-item>
-        </a-breadcrumb>
-        <a-layout-content
-          :style="{
-            background: '#fff',
-            padding: '24px',
-            margin: 0,
-            minHeight: '280px',
-            backgroundColor: '#f5f5f5'
-          }"
-        >
-          <RouterView />
-        </a-layout-content>
-      </a-layout>
+  <a-layout has-sider>
+    <siderbar />
+    <a-layout :style="{ marginLeft: '250px' }">
+      <a-layout-header :style="{ background: '#fff' }">
+        <a-input-search
+          v-model:value="value"
+          size="large"
+          placeholder="input search text"
+          style="width: 350px; padding-top: 20px; margin-left: 100px"
+          @search="onSearch"
+        />
+      </a-layout-header>
+      <hr style="margin-top: 24px" />
+      <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial', minHeight: '85vh' }">
+        <div :style="{ padding: '24px', backgroundColor: 'rgb(245 245 245)', textAlign: 'center' }">
+          <router-view />
+        </div>
+      </a-layout-content>
+      <!-- <a-layout-footer :style="{ textAlign: 'center' }">
+        Ant Design ©2018 Created by Ant UED
+      </a-layout-footer> -->
     </a-layout>
   </a-layout>
 </template>
 
 <style scoped>
-#components-layout-demo-top-side-2 .logo {
-  float: left;
-  width: 120px;
-  height: 31px;
-  margin: 16px 24px 16px 0;
+.site-layout .site-layout-background {
+  background-color: rgb(245 245 245) !important;
+  width: 250px !important;
 }
-
-.ant-row-rtl #components-layout-demo-top-side-2 .logo {
-  float: right;
-  margin: 16px 0 16px 24px;
+.ant-layout-header {
+  background-color: rgb(245 245 245) !important;
 }
-
-.site-layout-background {
-  background: #fff;
+.ant-layout-content {
+  background-color: rgb(245 245 245) !important;
 }
 </style>

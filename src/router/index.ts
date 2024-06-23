@@ -4,6 +4,7 @@ import SignUp from '../views/SignUp.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
     {
       path: '/',
       name: 'home',
@@ -12,33 +13,22 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     },
     {
       path: '/transaction/add/chi',
       name: 'transaction-chi',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
+
       component: () => import('../views/TransactionCreateChi.vue')
     },
     {
       path: '/transactions',
       name: 'transactions',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/TransactionList.vue')
     },
     {
       path: '/transaction/list',
       name: 'transaction/list',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/transactionList_1.vue')
     },
     {
@@ -48,5 +38,19 @@ const router = createRouter({
     }
   ]
 })
+// Simulate an authentication check function
+function isAuthenticated() {
+  // Replace this with actual authentication logic
+  return !!localStorage.getItem('userToken')
+}
 
+// Add the beforeEach guard
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'signup' && !isAuthenticated()) {
+    // Redirect to signup page if not authenticated
+    next({ name: 'signup' })
+  } else {
+    next() // Allow navigation if authenticated or navigating to signup
+  }
+})
 export default router

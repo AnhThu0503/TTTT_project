@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { reactive, toRaw } from 'vue'
+import { reactive, toRaw, computed } from 'vue'
 import { Form } from 'ant-design-vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-
+import { FilterOutlined } from '@ant-design/icons-vue'
 // Initialize the form and the date value
 const useForm = Form.useForm
-
 const modelRef = reactive({
   categoryID: 1,
   categoryName: 'Ăn uống',
@@ -120,10 +119,68 @@ const data = [
     categoryType: 'Thu'
   }
 ]
+const minAmount = ref<number | null>(null)
+const maxAmount = ref<number | null>(null)
+const startDate = ref<Dayjs | null>(null)
+const endDate = ref<Dayjs | null>(null)
+const filteredData = computed(() => {
+  return data.filter((item) => {
+    const amount = parseInt(item.transactionAmount.toString())
+    const date = dayjs(item.transactionDate)
+    const isAmountInRange =
+      (minAmount.value === null || amount >= minAmount.value) &&
+      (maxAmount.value === null || amount <= maxAmount.value)
+    const isDateInRange =
+      (startDate.value === null ||
+        date.isAfter(startDate.value, 'day') ||
+        date.isSame(startDate.value, 'day')) &&
+      (endDate.value === null ||
+        date.isBefore(endDate.value, 'day') ||
+        date.isSame(endDate.value, 'day'))
+    return isAmountInRange && isDateInRange
+  })
+})
 </script>
 
 <template>
-  <a-table :columns="columns" :data-source="data">
+  <div class="d-flex">
+    <div class="d-flex my-3 pe-4 me-4">
+      <div class="card-icon me-2">
+        <FilterOutlined class="icon fs-4" />
+      </div>
+      <a-input-number
+        size="large"
+        v-model:value="minAmount"
+        placeholder="Số tiền từ..."
+        style="width: 200px"
+      />
+      <a-input-number
+        size="large"
+        v-model:value="maxAmount"
+        placeholder="Đến"
+        style="margin-left: 10px; width: 200px"
+      />
+    </div>
+    <div class="d-flex my-3 ps-4">
+      <div class="card-icon2">
+        <FilterOutlined class="icon fs-4" />
+      </div>
+      <a-date-picker
+        size="large"
+        v-model:value="startDate"
+        placeholder="Từ ngày"
+        style="margin-left: 10px"
+      />
+      <a-date-picker
+        size="large"
+        v-model:value="endDate"
+        placeholder="Đến ngày"
+        style="margin-left: 10px"
+      />
+    </div>
+  </div>
+
+  <a-table :columns="columns" :data-source="filteredData">
     <template #headerCell="{ column }">
       <template v-if="column.key === 'categoryName'">
         <span style="font-weight: 600">Danh mục</span>
@@ -185,3 +242,28 @@ const data = [
     </template>
   </a-table>
 </template>
+<style scoped>
+.card-icon {
+  background: linear-gradient(60deg, #ffa726, #fb8c00);
+  box-shadow:
+    0 12px 20px -10px rgba(255, 152, 0, 0.28),
+    0 4px 20px 0 rgba(0, 0, 0, 0.12),
+    0 7px 8px -5px rgba(255, 152, 0, 0.2);
+  border-radius: 5px;
+  width: 50px;
+}
+.card-icon2 {
+  background: linear-gradient(60deg, #66bb6a, #43a047);
+  box-shadow:
+    0 12px 20px -10px rgba(76, 175, 80, 0.28),
+    0 4px 20px 0 rgba(0, 0, 0, 0.12),
+    0 7px 8px -5px rgba(76, 175, 80, 0.2);
+  border-radius: 5px;
+  width: 50px;
+}
+.icon {
+  text-align: center;
+  line-height: 33px;
+  color: #fff;
+}
+</style>
